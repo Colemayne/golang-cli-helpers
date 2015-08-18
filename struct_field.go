@@ -1,4 +1,4 @@
-package main
+package clihelpers
 
 import (
 	"strings"
@@ -136,7 +136,7 @@ func getFlagsForValue(value reflect.Value, ns []string) []cli.Flag {
 	valueType := value.Type()
 	for i := 0; i < valueType.NumField(); i++ {
 		newFlags := getFlagsForStructField(valueType.Field(i), value.Field(i), ns)
-		flags = append(flags, newFlags)
+		flags = append(flags, newFlags...)
 	}
 
 	return flags

@@ -26,6 +26,9 @@ func (s StructFieldValue) Set(val string) error {
 }
 
 func (s StructFieldValue) String() string {
+	if !s.value.IsValid() {
+		return ""
+	}
 	if s.value.Kind() == reflect.Ptr && s.value.IsNil() {
 		return ""
 	}

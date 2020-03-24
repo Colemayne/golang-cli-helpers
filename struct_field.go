@@ -1,10 +1,11 @@
 package clihelpers
 
 import (
-	"github.com/urfave/cli"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 type StructFieldValue struct {
@@ -45,17 +46,17 @@ func (f StructFieldFlag) String() string {
 	if sf, ok := f.Value.(StructFieldValue); ok {
 		if sf.IsBoolFlag() {
 			flag := &cli.BoolFlag{
-				Name:   f.Name,
-				Usage:  f.Usage,
-				EnvVar: f.EnvVar,
+				Name:    f.Name,
+				Usage:   f.Usage,
+				EnvVars: f.EnvVars,
 			}
 			return flag.String()
 		} else {
 			flag := &cli.StringFlag{
-				Name:   f.Name,
-				Value:  sf.String(),
-				Usage:  f.Usage,
-				EnvVar: f.EnvVar,
+				Name:    f.Name,
+				Value:   sf.String(),
+				Usage:   f.Usage,
+				EnvVars: f.EnvVars,
 			}
 			return flag.String()
 		}
@@ -80,16 +81,18 @@ func getStructFieldFlag(field reflect.StructField, fieldValue reflect.Value, ns 
 		return []cli.Flag{}
 	}
 
+	envVarArray := []string{field.Tag.Get("env")}
+
 	flag := cli.GenericFlag{
 		Name: strings.Join(names, ", "),
 		Value: StructFieldValue{
 			field: field,
 			value: fieldValue,
 		},
-		Usage:  reName.ReplaceAllString(field.Tag.Get("description"), "`$1`"),
-		EnvVar: field.Tag.Get("env"),
+		Usage:   reName.ReplaceAllString(field.Tag.Get("description"), "`$1`"),
+		EnvVars: envVarArray,
 	}
-	return []cli.Flag{StructFieldFlag{GenericFlag: flag}}
+	return []cli.Flag{&StructFieldFlag{GenericFlag: flag}}
 }
 
 func getFlagsForStructField(field reflect.StructField, fieldValue reflect.Value, ns []string) []cli.Flag {
